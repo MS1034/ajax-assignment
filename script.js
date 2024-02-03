@@ -39,66 +39,38 @@ function getSunInfo() {
 function setValues(data) {
   const result = document.getElementById("result");
 
-  const sun_rise = document.getElementById("sunrise");
-  const sun_set = document.getElementById("sunset");
-  const solar_noon = document.getElementById("solar_noon");
-  const day_length = document.getElementById("day_length");
-  const civil_twilight_begin = document.getElementById("civil_twilight_begin");
-  const civil_twilight_end = document.getElementById("civil_twilight_end");
-  const nautical_twilight_begin = document.getElementById(
-    "nautical_twilight_begin"
-  );
-  const nautical_twilight_end = document.getElementById(
-    "nautical_twilight_end"
-  );
-  const astronomical_twilight_begin = document.getElementById(
-    "astronomical_twilight_begin"
-  );
-  const astronomical_twilight_end = document.getElementById(
-    "astronomical_twilight_end"
-  );
-  if (sun_set) {
-    sun_set.textContent = `${JSON.stringify(data.results.sunset)}`;
+  // Define an object mapping between property names and corresponding element IDs
+  const propertyToElementMapping = {
+    sunrise: "sunrise",
+    sunset: "sunset",
+    solar_noon: "solar_noon",
+    day_length: "day_length",
+    civil_twilight_begin: "civil_twilight_begin",
+    civil_twilight_end: "civil_twilight_end",
+    nautical_twilight_begin: "nautical_twilight_begin",
+    nautical_twilight_end: "nautical_twilight_end",
+    astronomical_twilight_begin: "astronomical_twilight_begin",
+    astronomical_twilight_end: "astronomical_twilight_end",
+  };
+
+  // Iterate over the properties and update corresponding elements
+  for (const [property, elementId] of Object.entries(
+    propertyToElementMapping
+  )) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      // Use the convertTimeStringToCountryTime function for specific properties
+      const value =
+        property != "day_length"
+          ? convertTimeStringToCountryTime(
+              JSON.stringify(data.results[property]) + "GMT"
+            )
+          : data.results[property];
+
+      element.textContent = value;
+    }
   }
-  if (sun_rise) {
-    sun_rise.textContent = `${JSON.stringify(data.results.sunrise)}`;
-  }
-  if (solar_noon) {
-    solar_noon.textContent = `${JSON.stringify(data.results.solar_noon)}`;
-  }
-  if (day_length) {
-    day_length.textContent = `${JSON.stringify(data.results.day_length)}`;
-  }
-  if (civil_twilight_begin) {
-    civil_twilight_begin.textContent = `${JSON.stringify(
-      data.results.civil_twilight_begin
-    )}`;
-  }
-  if (civil_twilight_end) {
-    civil_twilight_end.textContent = `${JSON.stringify(
-      data.results.civil_twilight_end
-    )}`;
-  }
-  if (nautical_twilight_begin) {
-    nautical_twilight_begin.textContent = `${JSON.stringify(
-      data.results.nautical_twilight_begin
-    )}`;
-  }
-  if (nautical_twilight_end) {
-    nautical_twilight_end.textContent = `${JSON.stringify(
-      data.results.nautical_twilight_end
-    )}`;
-  }
-  if (astronomical_twilight_begin) {
-    astronomical_twilight_begin.textContent = `${JSON.stringify(
-      data.results.astronomical_twilight_begin
-    )}`;
-  }
-  if (astronomical_twilight_end) {
-    astronomical_twilight_end.textContent = `${JSON.stringify(
-      data.results.astronomical_twilight_end
-    )}`;
-  }
+
   result.style.display = "block";
 }
 
@@ -115,4 +87,31 @@ function isValidLongitude(longitude) {
     longitude >= -180 &&
     longitude <= 180
   );
+}
+
+function convertTimeStringToCountryTime(inputTimeString) {
+  const timezone_options = {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+  const countryCode = new Intl.DateTimeFormat(
+    undefined,
+    timezone_options
+  ).resolvedOptions().timeZone;
+  // Create a Date object using the input time string
+  const inputDate = new Date(`2000-01-01 ${inputTimeString}`);
+
+  // Get the UTC time in milliseconds
+  const utcTime = inputDate.getTime();
+
+  // Create a new Date object for the local time in the specified country
+  const localDateInCountry = new Date(utcTime);
+
+  // Use Intl.DateTimeFormat to format the time based on the specified country code
+  const options = { hour12: true, timeZone: countryCode };
+  const localTimeStringInCountry = localDateInCountry.toLocaleTimeString(
+    "en-US",
+    options
+  );
+
+  return localTimeStringInCountry;
 }
