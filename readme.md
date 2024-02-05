@@ -11,7 +11,7 @@
 ### Project Description:
 This application showcases the effective use of AJAX.  This app inputs co-ordinates of a location and returns the timings pertaining to sun.
 
-![image-20240205220538977](C:\Users\Subhan\AppData\Roaming\Typora\typora-user-images\image-20240205220538977.png)
+![image.png](https://github.com/MS1034/ajax-assignment/blob/master/image.png?raw=true)
 
 ### Running the Project:
 1. **Clone the Repository:**
